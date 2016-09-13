@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "engines": {
+    "node": "^5.11.1",
+    "npm": "^3.9.3"
+  },
   "scripts": {
     "dev": "npm run lint && nodemon app.js",
     "test": "istanbul cover spec/run.js",
-    "lint": "./node_modules/.bin/eslint --quiet *.js */**/*.js"
+    "lint": "./node_modules/.bin/eslint --quiet *.js */**/*.js",
+    "dokku": {
+      "predeploy": "",
+      "postdeploy": ""
+    }
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcrypt": "^0.8.7",
     "bookshelf": "^0.10.0",
@@ -29,5 +35,15 @@
     "eslint": "^3.4.0",
     "eslint-config-google": "^0.6.0",
     "jasmine-spec-reporter": "^2.7.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/farhan2106/microservice-user-management.git"
+  },
+  "author": "Farhan Ghazali",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/farhan2106/microservice-user-management/issues"
+  },
+  "homepage": "https://github.com/farhan2106/microservice-user-management#readme"
 }
