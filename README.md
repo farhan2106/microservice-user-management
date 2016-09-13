@@ -1,5 +1,6 @@
 # Micro Service: User Management
 [![Build Status](https://travis-ci.org/farhan2106/microservice-user-management.svg?branch=master)](https://travis-ci.org/farhan2106/microservice-user-management)
+[![Coverage Status](https://coveralls.io/repos/github/farhan2106//microservice-user-management/badge.svg?branch=master)](https://coveralls.io/github/farhan2106//microservice-user-management?branch=master)
 
 ## Features
 Available defined tasks:
