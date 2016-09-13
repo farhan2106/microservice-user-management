@@ -1,0 +1,10 @@
+{
+    "extends": "google",
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "one-var": "off",
+      "no-useless-escape": "off"
+    }
+}
