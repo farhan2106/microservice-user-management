@@ -12,5 +12,5 @@ node_js:
   - "6.5"
 before_script:
   - npm cache clean
-  - npm install istanbul -g
-  - npm install jasmine -g
+  - npm install istanbul
+  - npm install jasmine
