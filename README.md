@@ -1,4 +1,5 @@
 # Micro Service: User Management
+[![Build Status](https://travis-ci.org/farhan2106/microservice-user-management.svg?branch=master)](https://travis-ci.org/farhan2106/microservice-user-management)
 
 ## Features
 Available defined tasks:
