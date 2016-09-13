@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "npm run lint && nodemon app.js",
-    "test": "istanbul cover spec/run.js",
+    "test": "istanbul cover spec/run.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "lint": "./node_modules/.bin/eslint --quiet *.js */**/*.js",
     "dokku": {
       "predeploy": "",
@@ -32,6 +32,7 @@
     "mysql": "^2.11.1"
   },
   "devDependencies": {
+    "coveralls": "^2.11.12",
     "eslint": "^3.4.0",
     "eslint-config-google": "^0.6.0",
     "jasmine-spec-reporter": "^2.7.0"
