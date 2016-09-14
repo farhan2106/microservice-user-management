@@ -13,6 +13,9 @@ node_js:
 before_script:
   - mv spec/test.env .env
   - npm cache clean
+  - npm install -g knex
   - npm install istanbul
   - npm install jasmine
   - npm install sqlite3
+  - knex migrate:latest
+  - knex seed:run
