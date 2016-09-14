@@ -3,16 +3,29 @@
 const JSData = require('js-data');
 const DSSqlAdapter = require('js-data-sql');
 
-const store = new JSData.DS();
-const adapter = new DSSqlAdapter({
+let dbConn = {
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS
+};
+
+if (process.env.DB_DRIVER === 'sqlite3') {
+  dbConn = {
+    filename: process.env.DB_NAME
+  };
+}
+
+let jsDataOpts = {
   client: process.env.DB_DRIVER,
-  connection: {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-  }
-});
+  connection: dbConn
+}
+if (process.env.DB_DRIVER === 'sqlite3') {
+  jsDataOpts.useNullAsDefault = true;
+}
+
+const store = new JSData.DS();
+const adapter = new DSSqlAdapter(jsDataOpts);
 store.registerAdapter('sql', adapter, {default: true});
 
 // init models

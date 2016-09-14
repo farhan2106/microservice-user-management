@@ -66,6 +66,7 @@ const socialCreate = function(req, reply) {
     }
     return User.create({
       username: `${socialId}.${socialSource}`,
+      password: `${socialId}.${socialSource}`,
       email: socialId,
       socialId: socialId,
       socialSource: socialSource,

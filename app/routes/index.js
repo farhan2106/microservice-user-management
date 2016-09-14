@@ -31,6 +31,12 @@ module.exports = [{
 
       User.findAll({
         where: {
+          socialId: {
+            '==': null
+          },
+          socialSource: {
+            '==': null
+          },
           active: {
             '==': 1
           },

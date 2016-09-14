@@ -2,14 +2,22 @@
 
 require('dotenv').config();
 
-let dbConf = {
+let dbConn = {
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS
+};
+
+if (process.env.DB_DRIVER === 'sqlite3') {
+  dbConn = {
+    filename: process.env.DB_NAME
+  };
+}
+
+const dbConf = {
   client: process.env.DB_DRIVER,
-  connection: {
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS
-  },
+  connection: dbConn,
   pool: {
     min: 2,
     max: 10
@@ -20,7 +28,8 @@ let dbConf = {
   },
   seeds: {
     directory: './database/seeds'
-  }
+  },
+  useNullAsDefault: true
 };
 
 module.exports = {
