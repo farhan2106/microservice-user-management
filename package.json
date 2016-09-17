@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "npm run lint && nodemon app.js",
-    "test": "istanbul cover -x spec/*.js spec/run.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "test": "istanbul cover -x spec/*.js -x spec/**/*.js spec/run.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "lint": "./node_modules/.bin/eslint --quiet *.js */**/*.js",
     "dokku": {
       "predeploy": "",
