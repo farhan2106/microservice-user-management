@@ -2,7 +2,10 @@
 
 const UserModel = require('./models/user');
 const Mongoose = require('mongoose');
-Mongoose.connect(process.env.DB);
+
+if (process.argv[1].indexOf('spec/run.js') === -1) {
+  Mongoose.connect(process.env.DB);
+}
 
 // init schema
 const userSchema = Mongoose.Schema({

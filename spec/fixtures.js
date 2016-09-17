@@ -5,7 +5,7 @@ const encrypt = require('./../app/utils').encrypt;
 
 Mockgoose(Mongoose).then(function() {
   Mongoose.connect('mongodb://example.com/TestingDB', function(err) {
-    done(err);
+    //done(err);
   });
 });
 

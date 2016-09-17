@@ -51,7 +51,6 @@ describe('/login', function () {
           }
         };
         server.inject(options, function(response) {
-          console.log(response)
           expect(response.statusCode).toBe(401);
           done();
         });
