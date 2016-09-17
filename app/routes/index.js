@@ -11,7 +11,7 @@ const UserModel = require("./../models/user");
  * POST: /login
  * POST: /logout
  * POST: /register
- * POST: /socialRegister
+ * POST: /socialRegister -  can also be used to do social login
  * GET: /activate/{secret} - to activate user
  * POST: /verifyToken
  * POST: /resetPassword
@@ -125,7 +125,8 @@ module.exports = [{
     validate: {
       payload: Joi.object({
         socialId: Joi.string().required(),
-        socialSource: Joi.string().required()
+        socialSource: Joi.string().required(),
+        email: Joi.string().regex(UserModel.emailRegex),
       })
     }
   }
@@ -194,6 +195,10 @@ module.exports = [{
         password = req.payload.password,
         User = req.Models.User;
 
+      /**
+       * When secret && password, it will really reset password
+       * Otherwise, it will just create a secret to reset password
+       */
       if (secret && password) {
         User.find({
           active: 0,

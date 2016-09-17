@@ -41,6 +41,7 @@ const create = function(req, reply) {
 const socialCreate = function(req, reply) {
   let socialId = req.payload.socialId,
     socialSource = req.payload.socialSource,
+    email = req.payload.email,
     User = req.Models.User;
 
   return User.find({
@@ -51,11 +52,11 @@ const socialCreate = function(req, reply) {
     if (users.length > 0) {
       return users.shift();
     }
-    // .insert bypass validation
+    // the secret in the password is important
     return User.create({
       username: `${socialId}.${socialSource}`,
-      password: encrypt(`${socialId}.${socialSource}`),
-      email: socialId + '@temp.com',
+      password: encrypt(`${socialId}.${socialSource}.${process.env.SECRET}`),
+      email: email,
       socialId: socialId,
       socialSource: socialSource,
       active: 1

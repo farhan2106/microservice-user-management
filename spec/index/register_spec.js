@@ -92,7 +92,8 @@ describe('/socialRegister', function () {
         url: "/socialRegister",
         payload: {
           socialId: socialId,
-          socialSource: socialSource
+          socialSource: socialSource,
+          email: 'someuser@google.com'
         }
       };
 
