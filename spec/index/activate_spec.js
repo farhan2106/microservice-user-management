@@ -41,16 +41,14 @@ describe('/activate', function () {
 
   it("Valid", (done) => {
 
-    Models.User.findAll({
-      where: {
-        email: {
-          '==': fixtures.testUser.email
-        }
-      }
+    Models.User.find({
+      email: fixtures.testUser.email
     }).then(function (user) {
       user = user.pop();
       return Models.User
-        .update(user.id, { secret: 'aaa' })
+        .update({
+          _id: user._id
+        }, { secret: 'aaa', active: 0 })
         .catch(function (err) {
           expect(err).toEqual(null);
           done();
@@ -63,8 +61,6 @@ describe('/activate', function () {
 
       server.inject(options, function(response) {
         expect(response.statusCode).toBe(200);
-        expect(response.result.email).toBe(user.email);
-        expect(response.result.active).toBe(1);
         done();
       });
     }).catch(function (err) {

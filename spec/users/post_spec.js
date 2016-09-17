@@ -90,7 +90,7 @@ describe('/users', function () {
 
       server.inject(options, function(response) {
         expect(response.statusCode).toBe(200);
-        Models.User.destroy(response.result.id)
+        Models.User.remove(response.result.id)
         .then(function () {
           done();
         });

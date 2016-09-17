@@ -38,26 +38,18 @@ server.auth.strategy('jwt', 'jwt', {
     // invalid if decoded data doesn't belong to existing users
     // invalid if token in blacklisted
 
-    Models.Blacklist.findAll({
-      where: {
-        token: {
-          '==': req.headers.authorization
-        }
-      }
+    Models.Blacklist.find({
+      token: req.headers.authorization
     }).then(blacklist => {
       if (blacklist.length > 0) {
         callback(Boom.unauthorized('Token has expired.'), false);
       }
 
-      return Models.User.findAll({
-        where: {
-          id: {
-            '==': decoded.id
-          }
-        }
+      return Models.User.find({
+        id: decoded.id
       });
-    }).then(user => {
-      if (user.length > 0) {
+    }).then(users => {
+      if (users) {
         callback(null, true);
       } else {
         callback(Boom.unauthorized('User not found.'), false);
@@ -70,7 +62,6 @@ server.auth.strategy('jwt', 'jwt', {
 });
 
 server.auth.default('jwt');
-
 server.route(require('./app/routes/index.js'));
 server.route(require('./app/routes/users.js'));
 

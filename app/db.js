@@ -1,48 +1,104 @@
 'use strict';
 
-const JSData = require('js-data');
-const DSSqlAdapter = require('js-data-sql');
+const UserModel = require('./models/user');
+const Mongoose = require('mongoose');
+Mongoose.connect(process.env.DB);
 
-let dbConn = {
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS
-};
-
-if (process.env.DB_DRIVER === 'sqlite3') {
-  dbConn = {
-    filename: process.env.DB_NAME
-  };
-}
-
-let jsDataOpts = {
-  client: process.env.DB_DRIVER,
-  connection: dbConn
-}
-if (process.env.DB_DRIVER === 'sqlite3') {
-  jsDataOpts.useNullAsDefault = true;
-}
-
-const store = new JSData.DS();
-const adapter = new DSSqlAdapter(jsDataOpts);
-store.registerAdapter('sql', adapter, {default: true});
+// init schema
+const userSchema = Mongoose.Schema({
+    username: {
+      type: String,
+      required: true,
+      index: { unique: true },
+      validate: {
+        validator: function(v) {
+          let r = new RegExp(process.env.REGEX_USERNAME);
+          return r.test(v);
+        },
+        message: '{VALUE} is not a valid username.'
+      },
+    },
+    email: {
+      type: String,
+      required: true,
+      index: { unique: true },
+      validate: {
+        validator: function(v) {
+          let r = new RegExp(UserModel.emailRegex);
+          return r.test(v);
+        },
+        message: '{VALUE} is not a valid email.'
+      },
+    },
+    password: {
+      type: String,
+      required: true
+      /*
+      // This regex is between client and web server. Not between web server and mongo.
+      validate: {
+        validator: function(v) {
+          let r = new RegExp(process.env.REGEX_PASSWORD);
+          return r.test(v);
+        },
+        message: '{VALUE} is not a valid password.'
+      },*/
+    },
+    active: {
+      type: Number,
+      default: 0
+    },
+    secret: {
+      type: String,
+      default: null
+    },
+    socialId: {
+      type: String,
+      default: null
+    },
+    socialSource: {
+      type: String,
+      default: null
+    },
+    createdAt: {
+      type: Number,
+      default: Date.now()
+    },
+    updatedAt: {
+      type: Number,
+      default: Date.now()
+    }
+});
+const blacklistSchema = Mongoose.Schema({
+  token: {
+    type: String,
+    required: true,
+  },
+  iss: {
+    type: String,
+    required: true,
+  },
+  iat: {
+    type: Number,
+    required: true,
+  },
+  exp: {
+    type: Number,
+    required: true,
+  }
+});
 
 // init models
-let User = store.defineResource('users'),
-  Blacklist = store.defineResource('blacklisted_tokens');
+let User = Mongoose.model('User', userSchema),
+  Blacklist = Mongoose.model('Blacklist', blacklistSchema);
 
 // background service for db
 let removeOldTokens = function() {
-  let now = parseInt(Date.now().toString().substring(0, 10), 10),
-    params = {
-      where: {
-        exp: {
-          '<=': now
-        }
-      }
-    };
-  Blacklist.destroyAll(params);
+  let now = parseInt(Date.now().toString().substring(0, 10), 10);
+  Blacklist.remove({ exp: { $lte: now } }, function (err) {
+    if (err) {
+      throw err;
+    }
+  });
 };
 setInterval(removeOldTokens, 86400); // 24h
 removeOldTokens();

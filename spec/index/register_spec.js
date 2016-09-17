@@ -26,7 +26,7 @@ describe('/register', function () {
       method: "POST",
       url: "/register",
       payload: {
-        username: 'farhan_ghazali',
+        username: fixtures.testUser.username,
         email: 'farhan_ghazali@yahoo.com',
         password: '12341234!Aa'
       }
@@ -65,15 +65,11 @@ describe('/register', function () {
       expect(response.statusCode).toBe(200);
       expect(response.result.email).toBe(email);
 
-      Models.User.findAll({
-        where: {
-          email: {
-            '==': email
-          }
-        }
+      Models.User.find({
+        email: email
       }).then((user) => {
         user = user.pop();
-        Models.User.destroy(user.id)
+        Models.User.remove(user.id)
         .then(function () {
           done();
         });
@@ -113,18 +109,12 @@ describe('/socialRegister', function () {
       expect(response.statusCode).toBe(200);
       expect(response.result.socialId).toBe(socialId);
 
-      Models.User.findAll({
-        where: {
-          socialId: {
-            '==': socialId
-          },
-          socialSource: {
-            '==': socialSource
-          }
-        }
+      Models.User.find({
+        socialId: socialId,
+        socialSource: socialSource
       }).then((user) => {
         user = user.pop();
-        Models.User.destroy(user.id)
+        Models.User.remove(user.id)
         .then(function () {
           done();
         });

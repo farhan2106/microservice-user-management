@@ -42,14 +42,15 @@ describe('/resetPassword (Attempt)', function () {
       method: "POST",
       url: "/resetPassword",
       payload: {
-        usernameOrEmail: 'testUser'
+        usernameOrEmail: fixtures.testUser.username
       }
     };
 
     server.inject(options, function(response) {
       expect(response.statusCode).toBe(200);
-      expect(response.result.secret).toBeDefined();
-      Models.User.update(response.result.id, {
+      Models.User.update({
+        username: fixtures.testUser.username
+      }, {
         active: 1,
         secret: null
       }).then((user) => {
@@ -116,7 +117,7 @@ describe('/resetPassword (Actual)', function () {
       method: "POST",
       url: "/resetPassword",
       payload: {
-        usernameOrEmail: 'testUser'
+        usernameOrEmail: fixtures.testUser.username
       }
     };
 
@@ -132,8 +133,9 @@ describe('/resetPassword (Actual)', function () {
 
       server.inject(options, function(response) {
         expect(response.statusCode).toBe(200);
-        expect(response.result.active).toBe(1);
-        Models.User.update(response.result.id, {
+        Models.User.update({
+          username: fixtures.testUser.username
+        }, {
           active: 1,
           secret: null
         }).then((user) => {

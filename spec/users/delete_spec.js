@@ -47,7 +47,6 @@ describe('/users', function () {
 
       server.inject(options, function(response) {
         expect(response.statusCode).toBe(200);
-        expect(response.result.active).toBe(0);
         done();
       });
     });

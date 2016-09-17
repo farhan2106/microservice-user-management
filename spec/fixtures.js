@@ -1,9 +1,5 @@
 const Models = require('./../app/db').Models;
 const encrypt = require('./../app/utils').encrypt;
-const JSData = require('js-data');
-
-Models.User.bypassCache = true;
-Models.Blacklist.bypassCache = true;
 
 let testUserId = null,
     testUser = {
@@ -29,8 +25,8 @@ let testUserId = null,
       });
     },
     delUser = function () {
-      return Models.Blacklist.destroyAll().then(function () {
-        return Models.User.destroy(testUserId)
+      return Models.Blacklist.remove({}).then(function () {
+        return Models.User.remove(testUserId)
         .catch(function (err) {
           console.log(err);
         });
@@ -41,16 +37,12 @@ let testUserId = null,
     };
 
 // Delete test user if any
-Models.User.findAll({
-  where: {
-    username: {
-      '==': testUser.username
-    }
-  }
+Models.User.find({
+  username: testUser.username
 })
-.then(function (user) {
-  if (user.length > 0)
-    Models.User.destroy(user[0].id);
+.then(function (users) {
+  if (users.length > 0)
+    Models.User.remove(users[0].id);
 })
 .catch(function (err) {
   console.log(err);

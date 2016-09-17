@@ -13,18 +13,11 @@ const create = function(req, reply) {
     password = req.payload.password,
     User = req.Models.User;
 
-  return User.findAll({
-    where: {
-      username: {
-        '==': username
-      },
-      email: {
-        '|==': email
-      }
-    }
+  return User.find({
+    $or: [{username: username}, {email: password}]
   })
-  .then(user => {
-    if (user.length > 0) {
+  .then(users => {
+    if (users.length > 0) {
       reply(Boom.unauthorized('Username or email already exist.'));
     } else {
       User.create({
@@ -34,7 +27,7 @@ const create = function(req, reply) {
         secret: genSecret()
       })
       .then(user => {
-        delete user.password;
+        user.password = '';
         reply(user);
       }).catch(function(err) {
         reply(Boom.serverUnavailable(err));
@@ -50,32 +43,29 @@ const socialCreate = function(req, reply) {
     socialSource = req.payload.socialSource,
     User = req.Models.User;
 
-  return User.findAll({
-    where: {
-      socialId: {
-        '==': socialId
-      },
-      socialSource: {
-        '==': socialSource
-      }
-    }
+  return User.find({
+    socialId: socialId,
+    socialSource: socialSource
   })
-  .then(user => {
-    if (user.length > 0) {
-      return user.shift();
+  .then(users => {
+    if (users.length > 0) {
+      return users.shift();
     }
+    // .insert bypass validation
     return User.create({
       username: `${socialId}.${socialSource}`,
-      password: `${socialId}.${socialSource}`,
-      email: socialId,
+      password: encrypt(`${socialId}.${socialSource}`),
+      email: socialId + '@temp.com',
       socialId: socialId,
       socialSource: socialSource,
       active: 1
+    }).then(result => {
+      return result;
     }).catch(function(err) {
       reply(Boom.serverUnavailable(err));
     });
   }).then(user => {
-    delete user.password;
+    user.password = '';
     reply(user);
   }).catch(function(err) {
     reply(Boom.serverUnavailable(err));

@@ -29,36 +29,24 @@ module.exports = [{
         expiresIn = req.payload.expiresIn,
         User = req.Models.User;
 
-      User.findAll({
-        where: {
-          socialId: {
-            '==': null
-          },
-          socialSource: {
-            '==': null
-          },
-          active: {
-            '==': 1
-          },
-          username: {
-            '==': usernameOrEmail
-          },
-          email: {
-            '|==': usernameOrEmail
-          }
-        }
+      User.find({
+        $and: [
+          {socialId: null, socialSource: null, active: 1},
+          {$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}
+        ]
       })
-      .then(function(user) {
-        if (user.length === 0) {
+      .then(users => {
+        if (users.length === 0) {
           reply(Boom.unauthorized('User not found.'));
         }
-        return user;
+        return users;
       })
-      .then(function(user) {
-        user = user.pop();
+      .then(users => {
+        let user = users.pop();
         if (Bcrypt.compareSync(password, user.password)) {
-          delete user.password;
-          let token = Jwt.sign(user, process.env.SECRET, {
+          delete user._doc.password;
+          delete user._doc.__v;
+          let token = Jwt.sign(user._doc, process.env.SECRET, {
             expiresIn: expiresIn,
             issuer: issuer
             // audience
@@ -151,25 +139,23 @@ module.exports = [{
       let secret = encodeURIComponent(req.params.secret),
         User = req.Models.User;
 
-      User.findAll({
-        where: {
-          secret: {
-            '==': secret
-          }
-        }
+      User.find({
+        secret: secret,
+        active: 0
       })
-      .then(user => {
-        if (user.length > 0) {
-          user = user.shift();
-          return User.update(user.id, {
+      .then(users => {
+        if (users.length > 0) {
+          let user = users.shift();
+          return User.update({
+            _id: user._id
+          }, {
             active: 1,
             secret: null
+          }).then(status => {
+            reply(status);
           });
         }
         reply(Boom.notFound('User not found.'));
-      }).then(user => {
-        delete user.password;
-        reply(user);
       }).catch(err => {
         reply(Boom.serverUnavailable(err));
       });
@@ -209,62 +195,52 @@ module.exports = [{
         User = req.Models.User;
 
       if (secret && password) {
-        User.findAll({
-          where: {
-            active: {
-              '==': 0
-            },
-            secret: {
-              '==': secret
-            }
-          }
+        User.find({
+          active: 0,
+          secret: secret
         })
-        .then(function(user) {
-          if (user.length === 0) {
+        .then(function(users) {
+          if (users.length === 0) {
             reply(Boom.notFound('User not found.'));
           }
-          return user;
+          return users.shift();
         }).then(function(user) {
-          user = user.shift();
-          return User.update(user.id, {
+          return User.update({
+            _id: user.id
+          }, {
             active: 1,
             password: encrypt(password),
             secret: null
+          }).then(function(status) {
+            reply(status);
           });
-        }).then(function(user) {
-          delete user.password;
-          reply(user);
         }).catch(err => {
           reply(Boom.serverUnavailable(err));
         });
       } else if (usernameOrEmail) {
-        User.findAll({
-          where: {
-            active: {
-              '==': 1
-            },
-            username: {
-              '==': usernameOrEmail
-            },
-            email: {
-              '|==': usernameOrEmail
-            }
-          }
+        let secret = UserModel.genSecret();
+        User.find({
+          $and: [
+            {active: 1},
+            {$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}
+          ]
         })
-        .then(function(user) {
-          if (user.length === 0) {
+        .then(function(users) {
+          if (users.length === 0) {
             reply(Boom.notFound('User not found.'));
           }
-          return user;
-        }).then(function(user) {
-          user = user.shift();
-          return User.update(user.id, {
+          return users;
+        }).then(function(users) {
+          let user = users.shift();
+          return User.update({
+            _id: user.id
+          }, {
             active: 0,
-            secret: UserModel.genSecret()
+            secret: secret
+          }).then(function(status) {
+            status.secret = secret;
+            reply(status);
           });
-        }).then(function(user) {
-          delete user.password;
-          reply(user);
         }).catch(err => {
           reply(Boom.serverUnavailable(err));
         });

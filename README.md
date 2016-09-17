@@ -1,6 +1,6 @@
 # Micro Service: User Management
 [![Build Status](https://travis-ci.org/farhan2106/microservice-user-management.svg?branch=master)](https://travis-ci.org/farhan2106/microservice-user-management)
-[![Coverage Status](https://coveralls.io/repos/github/farhan2106//microservice-user-management/badge.svg?branch=master)](https://coveralls.io/github/farhan2106//microservice-user-management?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/farhan2106/microservice-user-management/badge.svg?branch=master)](https://coveralls.io/github/farhan2106/microservice-user-management?branch=master)
 
 ## Features
 Available defined tasks:
@@ -73,12 +73,7 @@ Below are the features of this micro service.
       - id - User Id       
 
 ### Database
-It is using [js-data](http://www.js-data.io/) for ORM. Technically is should support
-Firebase, MySql, RethinkDB, MongoDB, Redis and etc via adapters. I only tested in MySql.
-
-Database migration and seeding is provided for `sql` database. Please run `knex migrate:latest` and `knex seed:run`.
-
-Please install `knex` globally, if you want to do migration and seeding,  `npm install knex -g`.
+It is using mongodb with mongoose.
 
 ### Login & Logout
 - User can login with `username` or `email`.

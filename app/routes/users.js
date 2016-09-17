@@ -4,6 +4,7 @@ const Joi = require('joi');
 const Boom = require('boom');
 const encrypt = require("./../utils").encrypt;
 const UserModel = require("./../models/user");
+const Id = require('valid-objectid');
 
 /**
  * POST: /users - create
@@ -35,25 +36,20 @@ module.exports = [{
     cors: true,
     handler: (req, reply) => {
       let idUsernameEmail = decodeURIComponent(req.params.finder),
+        finder = [{username: idUsernameEmail}, {email: idUsernameEmail}],
         User = req.Models.User;
 
-      User.findAll({
-        where: {
-          id: {
-            '==': idUsernameEmail
-          },
-          username: {
-            '|==': idUsernameEmail
-          },
-          email: {
-            '|==': idUsernameEmail
-          }
-        }
+      if (Id.isValid(idUsernameEmail)) {
+        finder.push({_id: idUsernameEmail});
+      }
+
+      User.find({
+        $or: finder
       })
-      .then(user => {
-        if (user.length > 0) {
-          user = user.shift();
-          delete user.password;
+      .then(users => {
+        if (users.length > 0) {
+          let user = users.shift();
+          user.password = '';
           reply(user);
         } else {
           throw Boom.notFound('User not found.');
@@ -81,12 +77,8 @@ module.exports = [{
         active = parseInt(req.payload.active, 10),
         User = req.Models.User;
 
-      User.findAll({
-        where: {
-          id: {
-            '==': id
-          }
-        }
+      User.find({
+        _id: id
       })
       .then(user => {
         if (username &&
@@ -115,10 +107,11 @@ module.exports = [{
         if (password) data.password = encrypt(password);
         if (email) data.email = email;
         data.active = active;
-        return User.update(id, data);
-      }).then(user => {
-        delete user.password;
-        reply(user);
+        return User.update({
+          _id: id
+        }, data);
+      }).then(status => {
+        reply(status);
       }).catch(err => {
         reply(err);
       });
@@ -144,11 +137,12 @@ module.exports = [{
       let id = req.params.id,
         User = req.Models.User;
 
-      User.update(id, {
+      User.update({
+        _id: id
+      }, {
         active: 0
-      }).then(user => {
-        delete user.password;
-        reply(user);
+      }).then(status => {
+        reply(status);
       }).catch(err => {
         reply(err);
       });
