@@ -11,11 +11,7 @@ language: node_js
 node_js:
   - "6.5"
 before_script:
-  - mv spec/test.env .env
+  - mv .env.sample .env
   - npm cache clean
-  - npm install -g knex
   - npm install istanbul
   - npm install jasmine
-  - npm install sqlite3
-  - knex migrate:latest
-  - knex seed:run

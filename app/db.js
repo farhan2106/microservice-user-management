@@ -107,5 +107,6 @@ module.exports = {
   Models: {
     User: User,
     Blacklist: Blacklist
-  }
+  },
+  Mongoose: Mongoose
 };

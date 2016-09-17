@@ -1,5 +1,13 @@
+const Mockgoose = require('mockgoose');
 const Models = require('./../app/db').Models;
+const Mongoose = require('./../app/db').Mongoose;
 const encrypt = require('./../app/utils').encrypt;
+
+Mockgoose(Mongoose).then(function() {
+  Mongoose.connect('mongodb://example.com/TestingDB', function(err) {
+    done(err);
+  });
+});
 
 let testUserId = null,
     testUser = {

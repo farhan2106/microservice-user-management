@@ -33,7 +33,8 @@
     "coveralls": "^2.11.12",
     "eslint": "^3.4.0",
     "eslint-config-google": "^0.6.0",
-    "jasmine-spec-reporter": "^2.7.0"
+    "jasmine-spec-reporter": "^2.7.0",
+    "mockgoose": "^6.0.6"
   },
   "repository": {
     "type": "git",
