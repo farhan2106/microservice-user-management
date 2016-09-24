@@ -26,7 +26,8 @@ const create = function(username, email, password) {
       secret: genSecret()
     })
     .then(user => {
-      user.password = '';
+      user = user.toObject();
+      delete user.password;
       return user;
     }).catch(function(err) {
       return Boom.serverUnavailable(err);
@@ -61,7 +62,8 @@ const socialCreate = function(socialId, socialSource, email) {
       return Boom.serverUnavailable(err);
     });
   }).then(user => {
-    user.password = '';
+    user = user.toObject();
+    delete user.password;
     return user;
   }).catch(function(err) {
     return Boom.serverUnavailable(err);

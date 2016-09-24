@@ -60,7 +60,8 @@ module.exports = [{
       .then(users => {
         if (users.length > 0) {
           let user = users.shift();
-          user.password = '';
+          user = user.toObject();
+          delete user.password;
           reply(user);
         } else {
           throw Boom.notFound(errorCodes.E1);
