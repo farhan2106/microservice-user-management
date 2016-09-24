@@ -2,6 +2,7 @@
 
 const Boom = require('boom');
 const encrypt = require("./../utils").encrypt;
+const errorCodes = require("./../error_codes");
 
 const genSecret = function() {
   return Math.random().toString(36).substring(7);
@@ -15,7 +16,7 @@ const create = function(username, email, password) {
   })
   .then(users => {
     if (users.length > 0) {
-      return Boom.unauthorized('Username or email already exist.');
+      return Boom.unauthorized(errorCodes.E9);
     }
 
     return Models.User.create({

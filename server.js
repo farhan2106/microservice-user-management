@@ -4,6 +4,7 @@ require('dotenv').config();
 const Good = require('good');
 const Hapi = require('hapi');
 const Models = require('./app/db').Models;
+const errorCodes = require("./app/error_codes");
 const Boom = require('boom');
 
 const server = new Hapi.Server({
@@ -51,7 +52,7 @@ server.auth.strategy('jwt', 'jwt', {
       token: req.headers.authorization
     }).then(blacklist => {
       if (blacklist.length > 0) {
-        callback(Boom.unauthorized('Token has expired.'), false);
+        callback(Boom.unauthorized(errorCodes.E8), false);
       }
 
       return Models.User.find({
@@ -61,7 +62,7 @@ server.auth.strategy('jwt', 'jwt', {
       if (users) {
         callback(null, true);
       } else {
-        callback(Boom.unauthorized('User not found.'), false);
+        callback(Boom.unauthorized(errorCodes.E1), false);
       }
     }).catch(err => {
       callback(err, false);

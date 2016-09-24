@@ -6,4 +6,6 @@ module.exports = {
   'E5': 'E5|Invalid password string.',
   'E6': 'E6|Invalid email string.',
   'E7': 'E7|Invalid username string.',
+  'E8': 'E8|Token has expired.',
+  'E9': 'E9|Username or email already exist.'
 }
