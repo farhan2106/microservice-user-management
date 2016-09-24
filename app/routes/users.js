@@ -63,7 +63,7 @@ module.exports = [{
           user.password = '';
           reply(user);
         } else {
-          throw Boom.notFound(errorCodes['E1']);
+          throw Boom.notFound(errorCodes.E1);
         }
       }).catch(err => {
         reply(err);
@@ -94,14 +94,14 @@ module.exports = [{
       .then(user => {
         if (username &&
             !new RegExp(process.env.REGEX_USERNAME).test(username)) {
-          throw Boom.badData(errorCodes['E4']);
+          throw Boom.badData(errorCodes.E4);
         }
         if (password &&
             !new RegExp(process.env.REGEX_PASSWORD).test(password)) {
-          throw Boom.badData(errorCodes['E5']);
+          throw Boom.badData(errorCodes.E5);
         }
         if (email && !UserModel.emailRegex.test(email)) {
-          throw Boom.badData(errorCodes['E6']);
+          throw Boom.badData(errorCodes.E6);
         }
         Joi.validate({
           active: active

@@ -38,7 +38,7 @@ module.exports = [{
       })
       .then(users => {
         if (users.length === 0) {
-          reply(Boom.unauthorized(errorCodes['E1']));
+          reply(Boom.unauthorized(errorCodes.E1));
         }
         return users;
       })
@@ -55,7 +55,7 @@ module.exports = [{
           });
           reply(token);
         } else {
-          reply(Boom.unauthorized(errorCodes['E2']));
+          reply(Boom.unauthorized(errorCodes.E2));
         }
       }).catch(err => {
         reply(err);
@@ -133,7 +133,7 @@ module.exports = [{
     handler: (req, reply) => {
       let socialId = req.payload.socialId,
         socialSource = req.payload.socialSource,
-        email = req.payload.email
+        email = req.payload.email;
 
       UserModel.socialCreate(socialId, socialSource, email)
       .then(user => {
@@ -177,7 +177,7 @@ module.exports = [{
             reply(status);
           });
         }
-        reply(Boom.notFound(errorCodes['E1']));
+        reply(Boom.notFound(errorCodes.E1));
       }).catch(err => {
         reply(Boom.serverUnavailable(err));
       });
@@ -229,7 +229,7 @@ module.exports = [{
         })
         .then(function(users) {
           if (users.length === 0) {
-            reply(Boom.notFound(errorCodes['E1']));
+            reply(Boom.notFound(errorCodes.E1));
           }
           return users.shift();
         }).then(function(user) {
@@ -255,7 +255,7 @@ module.exports = [{
         })
         .then(function(users) {
           if (users.length === 0) {
-            reply(Boom.notFound(errorCodes['E1']));
+            reply(Boom.notFound(errorCodes.E1));
           }
           return users;
         }).then(function(users) {
@@ -273,7 +273,7 @@ module.exports = [{
           reply(Boom.serverUnavailable(err));
         });
       } else {
-        reply(Boom.badImplementation(errorCodes['E3']));
+        reply(Boom.badImplementation(errorCodes.E3));
       }
     },
     validate: {
