@@ -28,7 +28,7 @@ describe('/register', function () {
       payload: {
         username: fixtures.testUser.username,
         email: 'farhan_ghazali@yahoo.com',
-        password: '12341234!Aa'
+        password: '12341234'
       }
     };
 
@@ -57,7 +57,7 @@ describe('/register', function () {
           payload: {
             username: 'farhan2106',
             email: email,
-            password: '12341234!Aa'
+            password: '12341234'
           }
         };
 

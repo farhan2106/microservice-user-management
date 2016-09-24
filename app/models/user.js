@@ -7,70 +7,64 @@ const genSecret = function() {
   return Math.random().toString(36).substring(7);
 };
 
-const create = function(req, reply) {
-  let username = req.payload.username,
-    email = req.payload.email,
-    password = req.payload.password,
-    User = req.Models.User;
+const create = function(username, email, password) {
+  let Models = require('./../db').Models;
 
-  return User.find({
-    $or: [{username: username}, {email: password}]
+  return Models.User.find({
+    $or: [{username: username}, {email: email}]
   })
   .then(users => {
     if (users.length > 0) {
-      reply(Boom.unauthorized('Username or email already exist.'));
-    } else {
-      User.create({
-        username: username,
-        email: email,
-        password: encrypt(password),
-        secret: genSecret()
-      })
-      .then(user => {
-        user.password = '';
-        reply(user);
-      }).catch(function(err) {
-        reply(Boom.serverUnavailable(err));
-      });
+      return Boom.unauthorized('Username or email already exist.');
     }
+
+    return Models.User.create({
+      username: username,
+      email: email,
+      password: encrypt(password),
+      secret: genSecret()
+    })
+    .then(user => {
+      user.password = '';
+      return user;
+    }).catch(function(err) {
+      return Boom.serverUnavailable(err);
+    });
   }).catch(function(err) {
-    reply(err);
+    return err;
   });
 };
 
-const socialCreate = function(req, reply) {
-  let socialId = req.payload.socialId,
-    socialSource = req.payload.socialSource,
-    email = req.payload.email,
-    User = req.Models.User;
+const socialCreate = function(socialId, socialSource, email) {
+    let Models = require('./../db').Models;
 
-  return User.find({
-    socialId: socialId,
-    socialSource: socialSource
-  })
-  .then(users => {
-    if (users.length > 0) {
-      return users.shift();
-    }
-    // the secret in the password is important
-    return User.create({
-      username: `${socialId}.${socialSource}`,
-      password: encrypt(`${socialId}.${socialSource}.${process.env.SECRET}`),
-      email: email,
+    return Models.User.find({
       socialId: socialId,
-      socialSource: socialSource,
-      active: 1
-    }).then(result => {
-      return result;
+      socialSource: socialSource
+    })
+    .then(users => {
+      if (users.length > 0) {
+        return users.shift();
+      }
+      // the secret in the password is important
+      return Models.User.create({
+        username: `${socialId}.${socialSource}`,
+        password: encrypt(`${socialId}.${socialSource}.${process.env.SECRET}`),
+        email: email,
+        socialId: socialId,
+        socialSource: socialSource,
+        active: 1
+      }).then(result => {
+        return result;
+      }).catch(function(err) {
+        return Boom.serverUnavailable(err);
+      });
+    }).then(user => {
+      user.password = '';
+      return user;
     }).catch(function(err) {
-      reply(Boom.serverUnavailable(err));
+      return Boom.serverUnavailable(err);
     });
-  }).then(user => {
-    user.password = '';
-    reply(user);
-  }).catch(function(err) {
-    reply(Boom.serverUnavailable(err));
-  });
 };
 
 const emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;

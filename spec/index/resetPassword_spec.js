@@ -83,7 +83,7 @@ describe('/resetPassword (Actual)', function () {
       url: "/resetPassword",
       payload: {
         secret: 'aaaa',
-        password: 'aaaaAAAA!3d'
+        password: 'aaaaAAAA'
       }
     };
 

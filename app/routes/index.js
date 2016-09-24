@@ -4,6 +4,7 @@ const Joi = require('joi');
 const Boom = require('boom');
 const Bcrypt = require('bcrypt');
 const Jwt = require('jsonwebtoken');
+const errorCodes = require("./../../app/error_codes");
 const encrypt = require("./../../app/utils").encrypt;
 const UserModel = require("./../models/user");
 
@@ -37,7 +38,7 @@ module.exports = [{
       })
       .then(users => {
         if (users.length === 0) {
-          reply(Boom.unauthorized('User not found.'));
+          reply(Boom.unauthorized(errorCodes['E1']));
         }
         return users;
       })
@@ -54,7 +55,7 @@ module.exports = [{
           });
           reply(token);
         } else {
-          reply(Boom.unauthorized('Invalid password.'));
+          reply(Boom.unauthorized(errorCodes['E2']));
         }
       }).catch(err => {
         reply(err);
@@ -103,7 +104,17 @@ module.exports = [{
     auth: false,
     cors: true,
     handler: (req, reply) => {
-      UserModel.create(req, reply);
+      let username = req.payload.username,
+        email = req.payload.email,
+        password = req.payload.password;
+
+      UserModel.create(username, email, password)
+      .then(user => {
+        reply(user);
+      })
+      .catch(err => {
+        reply(err);
+      });
     },
     validate: {
       payload: Joi.object({
@@ -120,13 +131,23 @@ module.exports = [{
     auth: false,
     cors: true,
     handler: (req, reply) => {
-      UserModel.socialCreate(req, reply);
+      let socialId = req.payload.socialId,
+        socialSource = req.payload.socialSource,
+        email = req.payload.email
+
+      UserModel.socialCreate(socialId, socialSource, email)
+      .then(user => {
+        reply(user);
+      })
+      .catch(err => {
+        reply(err);
+      });
     },
     validate: {
       payload: Joi.object({
         socialId: Joi.string().required(),
         socialSource: Joi.string().required(),
-        email: Joi.string().regex(UserModel.emailRegex),
+        email: Joi.string().regex(UserModel.emailRegex)
       })
     }
   }
@@ -156,7 +177,7 @@ module.exports = [{
             reply(status);
           });
         }
-        reply(Boom.notFound('User not found.'));
+        reply(Boom.notFound(errorCodes['E1']));
       }).catch(err => {
         reply(Boom.serverUnavailable(err));
       });
@@ -171,10 +192,12 @@ module.exports = [{
   method: 'POST',
   path: '/verifyToken',
   config: {
+    auth: false,
     cors: true,
     handler: (req, reply) => {
       let token = req.headers.authorization;
 
+      // @todo: if token is in blacklist, then token is invalid. throw error
       try {
         let decoded = Jwt.verify(token, process.env.SECRET);
         reply(decoded);
@@ -206,7 +229,7 @@ module.exports = [{
         })
         .then(function(users) {
           if (users.length === 0) {
-            reply(Boom.notFound('User not found.'));
+            reply(Boom.notFound(errorCodes['E1']));
           }
           return users.shift();
         }).then(function(user) {
@@ -232,7 +255,7 @@ module.exports = [{
         })
         .then(function(users) {
           if (users.length === 0) {
-            reply(Boom.notFound('User not found.'));
+            reply(Boom.notFound(errorCodes['E1']));
           }
           return users;
         }).then(function(users) {
@@ -250,7 +273,7 @@ module.exports = [{
           reply(Boom.serverUnavailable(err));
         });
       } else {
-        reply(Boom.badImplementation('Invalid parameters.'));
+        reply(Boom.badImplementation(errorCodes['E3']));
       }
     },
     validate: {

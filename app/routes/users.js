@@ -2,6 +2,7 @@
 
 const Joi = require('joi');
 const Boom = require('boom');
+const errorCodes = require("./../../app/error_codes");
 const encrypt = require("./../utils").encrypt;
 const UserModel = require("./../models/user");
 const Id = require('valid-objectid');
@@ -19,7 +20,17 @@ module.exports = [{
   config: {
     cors: true,
     handler: (req, reply) => {
-      UserModel.create(req, reply);
+      let username = req.payload.username,
+        email = req.payload.email,
+        password = req.payload.password;
+
+      UserModel.create(username, email, password)
+      .then(user => {
+        reply(user);
+      })
+      .catch(err => {
+        reply(err);
+      });
     },
     validate: {
       payload: Joi.object({
@@ -52,7 +63,7 @@ module.exports = [{
           user.password = '';
           reply(user);
         } else {
-          throw Boom.notFound('User not found.');
+          throw Boom.notFound(errorCodes['E1']);
         }
       }).catch(err => {
         reply(err);
@@ -83,14 +94,14 @@ module.exports = [{
       .then(user => {
         if (username &&
             !new RegExp(process.env.REGEX_USERNAME).test(username)) {
-          throw Boom.badData('Invalid username string.');
+          throw Boom.badData(errorCodes['E4']);
         }
         if (password &&
             !new RegExp(process.env.REGEX_PASSWORD).test(password)) {
-          throw Boom.badData('Invalid password string.');
+          throw Boom.badData(errorCodes['E5']);
         }
         if (email && !UserModel.emailRegex.test(email)) {
-          throw Boom.badData('Invalid email string.');
+          throw Boom.badData(errorCodes['E6']);
         }
         Joi.validate({
           active: active

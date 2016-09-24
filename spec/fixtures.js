@@ -13,7 +13,7 @@ let testUserId = null,
     testUser = {
       username: 'testUser',
       email: 'testUser@gmail.com',
-      password: 'abcd!1234A',
+      password: 'abcdabcda',
       active: 1,
       secret: null
     },

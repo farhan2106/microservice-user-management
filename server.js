@@ -9,7 +9,16 @@ const Boom = require('boom');
 const server = new Hapi.Server({
   debug: {request: ['error']}
 });
-server.connection({port: 3000});
+// @todo: whitelist certain ip, not just *
+server.connection({
+  host: 'localhost',
+  port: 3000,
+  routes: {
+    cors: {
+      origin: ['*']
+    }
+  }
+});
 
 server.register([
   require('hapi-auth-jwt2'),
