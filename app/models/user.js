@@ -86,6 +86,12 @@ const sendActivationEmail = function(user) {
       }
     });
 
+  // should we mock it here? or in the unit test, we expect that email is not sent?
+  if (process.mainModule.filename.indexOf('spec/run.js') > -1) {
+    let nodemailerMock = require('nodemailer-mock');
+    transporter = nodemailerMock.createTransport();
+  }
+
   transporter.sendMail({
     from: 'admin@fgnet.tech',
     to: user.email,

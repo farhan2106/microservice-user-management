@@ -135,8 +135,7 @@ describe('POST /activate', function () {
       };
 
       server.inject(options, function(response) {
-        // expecting that email is not sent
-        expect(response.statusCode).toBe(503);
+        expect(response.statusCode).toBe(200);
         done();
       });
     }).catch(function (err) {
