@@ -7,7 +7,7 @@ const Models = fixtures.Models;
  */
 let token = null;
 
-describe('/users', function () {
+describe('POST /users', function () {
 
   beforeEach(function (done) {
     fixtures.createUser()

@@ -7,7 +7,7 @@ const Models = fixtures.Models;
  */
 let userId = null;
 
-describe('/users', function () {
+describe('DELETE /users', function () {
 
   beforeEach(function (done) {
     fixtures.createUser()
