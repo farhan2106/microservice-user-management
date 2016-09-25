@@ -114,7 +114,7 @@ module.exports = [{
         return UserModel.sendActivationEmail(user);
       })
       .then(user => {
-        //user = user.toObject();
+        // user = user.toObject();
         delete user.password;
         reply(user);
       })
@@ -143,7 +143,7 @@ module.exports = [{
 
       UserModel.socialCreate(socialId, socialSource, email)
       .then(user => {
-        //user = user.toObject();
+        // user = user.toObject();
         delete user.password;
         reply(user);
       })

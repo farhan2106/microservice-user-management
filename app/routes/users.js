@@ -26,7 +26,7 @@ module.exports = [{
 
       UserModel.create(username, email, password)
       .then(user => {
-        //user = user.toObject();
+        // user = user.toObject();
         delete user.password;
         reply(user);
       })
