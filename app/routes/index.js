@@ -14,6 +14,7 @@ const UserModel = require("./../models/user");
  * POST: /register
  * POST: /socialRegister -  can also be used to do social login
  * GET: /activate/{secret} - to activate user
+ * POST: /activate - resend activation email
  * POST: /verifyToken
  * POST: /resetPassword
  */
@@ -110,6 +111,11 @@ module.exports = [{
 
       UserModel.create(username, email, password)
       .then(user => {
+        return UserModel.sendActivationEmail(user);
+      })
+      .then(user => {
+        //user = user.toObject();
+        delete user.password;
         reply(user);
       })
       .catch(err => {
@@ -137,6 +143,8 @@ module.exports = [{
 
       UserModel.socialCreate(socialId, socialSource, email)
       .then(user => {
+        //user = user.toObject();
+        delete user.password;
         reply(user);
       })
       .catch(err => {
@@ -148,6 +156,40 @@ module.exports = [{
         socialId: Joi.string().required(),
         socialSource: Joi.string().required(),
         email: Joi.string().regex(UserModel.emailRegex)
+      })
+    }
+  }
+}, {
+  method: 'POST',
+  path: `/activate`,
+  config: {
+    auth: false,
+    cors: true,
+    handler: (req, reply) => {
+      let usernameOrEmail = req.payload.usernameOrEmail,
+        User = req.Models.User;
+
+      User.find({
+        $or: [{username: usernameOrEmail}, {email: usernameOrEmail}]
+      })
+      .then(users => {
+        if (users.length > 0) {
+          let user = users.shift();
+          return UserModel.sendActivationEmail(user);
+        }
+        reply(Boom.notFound(errorCodes.E1));
+      })
+      .then(user => {
+        user = user.toObject();
+        delete user.password;
+        reply(user);
+      }).catch(err => {
+        reply(Boom.serverUnavailable(err));
+      });
+    },
+    validate: {
+      payload: Joi.object({
+        usernameOrEmail: Joi.string()
       })
     }
   }
@@ -195,12 +237,32 @@ module.exports = [{
     auth: false,
     cors: true,
     handler: (req, reply) => {
-      let token = req.headers.authorization;
+      let token = req.headers.authorization,
+        User = req.Models.User,
+        Blacklist = req.Models.Blacklist;
 
       // @todo: if token is in blacklist, then token is invalid. throw error
       try {
         let decoded = Jwt.verify(token, process.env.SECRET);
-        reply(decoded);
+
+        Blacklist.find({
+          token: req.headers.authorization
+        }).then(blacklist => {
+          if (blacklist.length > 0) {
+            reply(Boom.unauthorized(errorCodes.E8));
+          }
+          return User.find({
+            id: decoded.id
+          });
+        }).then(users => {
+          if (users) {
+            reply(decoded);
+          } else {
+            reply(Boom.unauthorized(errorCodes.E1));
+          }
+        }).catch(err => {
+          reply(Boom.serverUnavailable(err));
+        });
       } catch (jwtErr) {
         reply(Boom.unauthorized(jwtErr));
       }

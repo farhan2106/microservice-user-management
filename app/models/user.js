@@ -1,6 +1,8 @@
 'use strict';
 
 const Boom = require('boom');
+const nodemailer = require('nodemailer');
+const Q = require('q');
 const encrypt = require("./../utils").encrypt;
 const errorCodes = require("./../error_codes");
 
@@ -16,7 +18,7 @@ const create = function(username, email, password) {
   })
   .then(users => {
     if (users.length > 0) {
-      return Boom.unauthorized(errorCodes.E9);
+      throw Boom.unauthorized(errorCodes.E9);
     }
 
     return Models.User.create({
@@ -72,9 +74,38 @@ const socialCreate = function(socialId, socialSource, email) {
 
 const emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
 
+const sendActivationEmail = function(user) {
+  let deferred = Q.defer(),
+    transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
+      secure: process.env.MAIL_SECURE, // use SSL
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+      }
+    });
+
+  transporter.sendMail({
+    from: 'admin@fgnet.tech',
+    to: user.email,
+    subject: 'Message title',
+    text: 'Plaintext version of the message',
+    html: 'HTML version of the message'
+  }, (err, info) => {
+    if (err === null) {
+      deferred.resolve(user);
+    } else {
+      deferred.reject(Boom.serverUnavailable(errorCodes.E10));
+    }
+  });
+  return deferred.promise;
+};
+
 module.exports = {
   create: create,
   socialCreate: socialCreate,
   emailRegex: emailRegex,
-  genSecret: genSecret
+  genSecret: genSecret,
+  sendActivationEmail: sendActivationEmail
 };

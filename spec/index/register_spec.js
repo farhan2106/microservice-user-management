@@ -62,8 +62,8 @@ describe('/register', function () {
         };
 
     server.inject(options, function(response) {
-      expect(response.statusCode).toBe(200);
-      expect(response.result.email).toBe(email);
+      // expecting that email is not sent
+      expect(response.statusCode).toBe(503);
 
       Models.User.find({
         email: email
