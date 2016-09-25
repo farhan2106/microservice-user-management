@@ -8,7 +8,7 @@
     "npm": "^3.10.3"
   },
   "scripts": {
-    "dev": "npm run lint && nodemon app.js",
+    "dev": "ncu && npm run lint && nodemon app.js",
     "test": "istanbul cover -x spec/*.js -x spec/**/*.js spec/run.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "lint": "./node_modules/.bin/eslint --quiet *.js */**/*.js",
     "dokku": {
@@ -26,6 +26,8 @@
     "hapi-auth-jwt2": "^7.1.3",
     "jsonwebtoken": "^7.1.9",
     "mongoose": "^4.6.0",
+    "nodemailer": "^2.6.4",
+    "q": "^1.4.1",
     "valid-objectid": "0.0.1"
   },
   "devDependencies": {
