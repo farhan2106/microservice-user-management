@@ -24,7 +24,7 @@ describe('GET /activate', function () {
   it("User not found.", (done) => {
     let options = {
       method: "GET",
-      url: "/activate/aaa",
+      url: "/activate/aaa/fakeUrl",
     };
 
     server.inject(options, function(response) {
@@ -56,11 +56,12 @@ describe('GET /activate', function () {
     }).then(function (user) {
       let options = {
         method: "GET",
-        url: "/activate/aaa",
+        url: "/activate/aaa/" + encodeURIComponent('http://google.com.my'),
       };
 
       server.inject(options, function(response) {
-        expect(response.statusCode).toBe(200);
+        // 302 - redirectiong found
+        expect(response.statusCode).toBe(302);
         done();
       });
     }).catch(function (err) {
@@ -96,7 +97,8 @@ describe('POST /activate', function () {
       method: "POST",
       url: "/activate",
       payload: {
-        usernameOrEmail: 'farhan2106@gmail.com'
+        usernameOrEmail: 'farhan2106@gmail.com',
+        redirectUrl: 'fakeUrl'
       }
     };
 
@@ -130,7 +132,8 @@ describe('POST /activate', function () {
         method: "POST",
         url: "/activate",
         payload: {
-          usernameOrEmail: fixtures.testUser.email
+          usernameOrEmail: fixtures.testUser.email,
+          redirectUrl: 'fakeUrl'
         }
       };
 

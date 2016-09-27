@@ -30,7 +30,7 @@ const create = function(username, email, password) {
     .then(user => {
       user = user.toObject();
       delete user.password;
-      delete user.secret;
+      //delete user.secret;
       return user;
     }).catch(function(err) {
       return Boom.serverUnavailable(err);
@@ -125,13 +125,13 @@ const sendPasswordResetEmail = function(user, redirectUrl) {
   });
 };
 
-const sendActivationEmail = function(user) {
+const sendActivationEmail = function(user, redirectUrl) {
   return sendEmail(user, {
     email: user.email,
     secret: user.secret,
     title: `${process.env.APP_NAME}: Activate your account`,
     message: `Please click on the following link to activate your account.<br />
-    <a href="${process.env.DOMAIN}/activate/${user.secret}">Activate</a>`
+    <a href="${process.env.DOMAIN}/activate/${user.secret}/${redirectUrl}">Activate</a>`
   });
 };
 

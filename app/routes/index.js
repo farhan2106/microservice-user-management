@@ -4,6 +4,7 @@ const Joi = require('joi');
 const Boom = require('boom');
 const Bcrypt = require('bcrypt');
 const Jwt = require('jsonwebtoken');
+const querystring = require('querystring');
 const errorCodes = require("./../../app/error_codes");
 const encrypt = require("./../../app/utils").encrypt;
 const UserModel = require("./../models/user");
@@ -13,7 +14,7 @@ const UserModel = require("./../models/user");
  * POST: /logout
  * POST: /register
  * POST: /socialRegister -  can also be used to do social login
- * GET: /activate/{secret} - to activate user
+ * GET: /activate/{secret}/{redirectUrl} - to activate user
  * POST: /activate - resend activation email
  * POST: /verifyToken
  * POST: /resetPassword
@@ -107,11 +108,12 @@ module.exports = [{
     handler: (req, reply) => {
       let username = req.payload.username,
         email = req.payload.email,
-        password = req.payload.password;
+        password = req.payload.password,
+        redirectUrl = encodeURIComponent(req.payload.redirectUrl);
 
       UserModel.create(username, email, password)
       .then(user => {
-        return UserModel.sendActivationEmail(user);
+        return UserModel.sendActivationEmail(user, redirectUrl);
       })
       .then(user => {
         // user = user.toObject();
@@ -127,7 +129,8 @@ module.exports = [{
       payload: Joi.object({
         username: Joi.string().regex(new RegExp(process.env.REGEX_USERNAME)),
         email: Joi.string().regex(UserModel.emailRegex),
-        password: Joi.string().regex(new RegExp(process.env.REGEX_PASSWORD))
+        password: Joi.string().regex(new RegExp(process.env.REGEX_PASSWORD)),
+        redirectUrl: Joi.string().required()
       })
     }
   }
@@ -169,6 +172,7 @@ module.exports = [{
     cors: true,
     handler: (req, reply) => {
       let usernameOrEmail = req.payload.usernameOrEmail,
+        redirectUrl = encodeURIComponent(req.payload.redirectUrl),
         User = req.Models.User;
 
       User.find({
@@ -177,7 +181,7 @@ module.exports = [{
       .then(users => {
         if (users.length > 0) {
           let user = users.shift();
-          return UserModel.sendActivationEmail(user);
+          return UserModel.sendActivationEmail(user, redirectUrl);
         }
         throw Boom.notFound(errorCodes.E1);
       })
@@ -194,13 +198,14 @@ module.exports = [{
     },
     validate: {
       payload: Joi.object({
-        usernameOrEmail: Joi.string()
+        usernameOrEmail: Joi.string().required(),
+        redirectUrl: Joi.string().required()
       })
     }
   }
 }, {
   method: 'GET',
-  path: `/activate/{secret}`,
+  path: `/activate/{secret}/{redirectUrl}`,
   config: {
     state: {
       parse: false, // parse and store in request.state
@@ -209,8 +214,13 @@ module.exports = [{
     auth: false,
     cors: true,
     handler: (req, reply) => {
-      let secret = encodeURIComponent(req.params.secret),
+      let secret = req.params.secret,
+        redirectUrl = decodeURIComponent(req.params.redirectUrl),
         User = req.Models.User;
+
+      // is there any querystring?
+      let qs = redirectUrl.substr(redirectUrl.indexOf('?'));
+      qs = querystring.parse(qs);
 
       User.find({
         secret: secret,
@@ -225,7 +235,13 @@ module.exports = [{
             active: 1,
             secret: null
           }).then(status => {
-            reply(status);
+            // append success or not success
+            qs.activated = 1;
+            qs = querystring.stringify(qs);
+            console.log('asdasdasdasd')
+            console.log(redirectUrl.split('?').pop() + '?' + qs)
+            console.log('asdasdasdasda')
+            reply.redirect(redirectUrl.split('?').pop() + '?' + qs);
           });
         }
         throw Boom.notFound(errorCodes.E1);
@@ -235,7 +251,8 @@ module.exports = [{
     },
     validate: {
       params: Joi.object({
-        secret: Joi.string().required()
+        secret: Joi.string().required(),
+        redirectUrl: Joi.string().required()
       })
     }
   }
