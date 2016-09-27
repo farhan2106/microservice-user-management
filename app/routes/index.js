@@ -39,7 +39,7 @@ module.exports = [{
       })
       .then(users => {
         if (users.length === 0) {
-          reply(Boom.unauthorized(errorCodes.E1));
+          throw Boom.unauthorized(errorCodes.E1);
         }
         return users;
       })
@@ -56,7 +56,7 @@ module.exports = [{
           });
           reply(token);
         } else {
-          reply(Boom.unauthorized(errorCodes.E2));
+          throw Boom.unauthorized(errorCodes.E2);
         }
       }).catch(err => {
         reply(err);
@@ -91,7 +91,7 @@ module.exports = [{
         .then(blacklist => {
           reply('Logged out.');
         }).catch(function(err) {
-          reply(Boom.serverUnavailable(err));
+          throw Boom.serverUnavailable(err);
         });
       } catch (jwtErr) {
         reply(Boom.unauthorized(jwtErr));
@@ -116,6 +116,7 @@ module.exports = [{
       .then(user => {
         // user = user.toObject();
         delete user.password;
+        delete user.secret;
         reply(user);
       })
       .catch(err => {
@@ -145,6 +146,7 @@ module.exports = [{
       .then(user => {
         // user = user.toObject();
         delete user.password;
+        delete user.secret;
         reply(user);
       })
       .catch(err => {
@@ -177,14 +179,17 @@ module.exports = [{
           let user = users.shift();
           return UserModel.sendActivationEmail(user);
         }
-        reply(Boom.notFound(errorCodes.E1));
+        throw Boom.notFound(errorCodes.E1);
       })
       .then(user => {
-        user = user.toObject();
+        if (typeof user.toObject === 'function') {
+          user = user.toObject();
+        }
         delete user.password;
+        delete user.secret;
         reply(user);
       }).catch(err => {
-        reply(Boom.serverUnavailable(err));
+        reply(err);
       });
     },
     validate: {
@@ -197,6 +202,10 @@ module.exports = [{
   method: 'GET',
   path: `/activate/{secret}`,
   config: {
+    state: {
+      parse: false, // parse and store in request.state
+      failAction: 'ignore' // may also be 'ignore' or 'log'
+    },
     auth: false,
     cors: true,
     handler: (req, reply) => {
@@ -219,9 +228,9 @@ module.exports = [{
             reply(status);
           });
         }
-        reply(Boom.notFound(errorCodes.E1));
+        throw Boom.notFound(errorCodes.E1);
       }).catch(err => {
-        reply(Boom.serverUnavailable(err));
+        reply(err);
       });
     },
     validate: {
@@ -241,7 +250,6 @@ module.exports = [{
         User = req.Models.User,
         Blacklist = req.Models.Blacklist;
 
-      // @todo: if token is in blacklist, then token is invalid. throw error
       try {
         let decoded = Jwt.verify(token, process.env.SECRET);
 
@@ -249,7 +257,7 @@ module.exports = [{
           token: req.headers.authorization
         }).then(blacklist => {
           if (blacklist.length > 0) {
-            reply(Boom.unauthorized(errorCodes.E8));
+            throw Boom.unauthorized(errorCodes.E8);
           }
           return User.find({
             id: decoded.id
@@ -258,13 +266,13 @@ module.exports = [{
           if (users) {
             reply(decoded);
           } else {
-            reply(Boom.unauthorized(errorCodes.E1));
+            throw Boom.unauthorized(errorCodes.E1);
           }
         }).catch(err => {
-          reply(Boom.serverUnavailable(err));
+          reply(err);
         });
       } catch (jwtErr) {
-        reply(Boom.unauthorized(jwtErr));
+        reply(jwtErr);
       }
     }
   }
@@ -276,6 +284,7 @@ module.exports = [{
     cors: true,
     handler: (req, reply) => {
       let usernameOrEmail = req.payload.usernameOrEmail,
+        redirectUrl = req.payload.redirectUrl,
         secret = req.payload.secret,
         password = req.payload.password,
         User = req.Models.User;
@@ -286,38 +295,38 @@ module.exports = [{
        */
       if (secret && password) {
         User.find({
-          active: 0,
+          // active: 0,
           secret: secret
         })
         .then(function(users) {
           if (users.length === 0) {
-            reply(Boom.notFound(errorCodes.E1));
+            throw Boom.notFound(errorCodes.E1);
           }
           return users.shift();
         }).then(function(user) {
           return User.update({
             _id: user.id
           }, {
-            active: 1,
+            // active: 1,
             password: encrypt(password),
             secret: null
           }).then(function(status) {
             reply(status);
           });
         }).catch(err => {
-          reply(Boom.serverUnavailable(err));
+          reply(err);
         });
-      } else if (usernameOrEmail) {
+      } else if (usernameOrEmail && redirectUrl) {
         let secret = UserModel.genSecret();
         User.find({
           $and: [
-            {active: 1},
+            // {active: 1},
             {$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}
           ]
         })
         .then(function(users) {
           if (users.length === 0) {
-            reply(Boom.notFound(errorCodes.E1));
+            throw Boom.notFound(errorCodes.E1);
           }
           return users;
         }).then(function(users) {
@@ -325,14 +334,17 @@ module.exports = [{
           return User.update({
             _id: user.id
           }, {
-            active: 0,
+            // active: 0,
             secret: secret
           }).then(function(status) {
-            status.secret = secret;
-            reply(status);
+            return UserModel.sendPasswordResetEmail(user, redirectUrl);
+          }).then(function(user) {
+            reply(user);
+          }).catch(err => {
+            reply(err);
           });
         }).catch(err => {
-          reply(Boom.serverUnavailable(err));
+          reply(err);
         });
       } else {
         reply(Boom.badImplementation(errorCodes.E3));
@@ -341,6 +353,7 @@ module.exports = [{
     validate: {
       payload: Joi.object({
         usernameOrEmail: Joi.string(),
+        redirectUrl: Joi.string(),
         secret: Joi.string(),
         password: Joi.string().regex(new RegExp(process.env.REGEX_PASSWORD))
       })

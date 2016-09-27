@@ -28,6 +28,7 @@ module.exports = [{
       .then(user => {
         // user = user.toObject();
         delete user.password;
+        delete user.secret;
         reply(user);
       })
       .catch(err => {
@@ -64,6 +65,7 @@ module.exports = [{
           let user = users.shift();
           user = user.toObject();
           delete user.password;
+          delete user.secret;
           reply(user);
         } else {
           throw Boom.notFound(errorCodes.E1);

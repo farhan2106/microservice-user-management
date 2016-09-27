@@ -30,6 +30,7 @@ describe('/verifyToken', function () {
     };
 
     server.inject(options, function(response) {
+      let token = response.result;
       options = {
         method: "POST",
         url: "/logout",
@@ -43,7 +44,7 @@ describe('/verifyToken', function () {
           method: "POST",
           url: "/verifyToken",
           headers: {
-            authorization: response.result
+            authorization: token
           }
         };
 

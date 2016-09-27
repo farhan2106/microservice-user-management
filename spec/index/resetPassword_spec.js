@@ -23,7 +23,8 @@ describe('/resetPassword (Attempt)', function () {
       method: "POST",
       url: "/resetPassword",
       payload: {
-        usernameOrEmail: 'testUsera'
+        usernameOrEmail: 'testUsera',
+        redirectUrl: 'http://localhost:3000/login'
       }
     };
 
@@ -42,7 +43,8 @@ describe('/resetPassword (Attempt)', function () {
       method: "POST",
       url: "/resetPassword",
       payload: {
-        usernameOrEmail: fixtures.testUser.username
+        usernameOrEmail: fixtures.testUser.username,
+        redirectUrl: 'http://localhost:3000/login'
       }
     };
 
@@ -113,20 +115,17 @@ describe('/resetPassword (Actual)', function () {
   });
 
   it("Valid", (done) => {
-    let options = {
-      method: "POST",
-      url: "/resetPassword",
-      payload: {
-        usernameOrEmail: fixtures.testUser.username
-      }
-    };
-
-    server.inject(options, function(response) {
-      options = {
+    let secret = 'aaa';
+    Models.User.update({
+      username: fixtures.testUser.username
+    }, {
+      secret: secret
+    }).then((user) => {
+      let options = {
         method: "POST",
         url: "/resetPassword",
         payload: {
-          secret: response.result.secret,
+          secret: secret,
           password: fixtures.testUser.password
         }
       };
@@ -136,13 +135,11 @@ describe('/resetPassword (Actual)', function () {
         Models.User.update({
           username: fixtures.testUser.username
         }, {
-          active: 1,
           secret: null
         }).then((user) => {
           done();
         });
       });
-
     });
   });
 
