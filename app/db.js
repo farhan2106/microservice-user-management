@@ -2,6 +2,7 @@
 
 const UserModel = require('./models/user');
 const Mongoose = require('mongoose');
+Mongoose.Promise = global.Promise;
 
 if (process.argv[1].indexOf('spec/run.js') === -1) {
   Mongoose.connect(process.env.DB);
