@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dokku": {
+      "predeploy": "cp /app/.env.prod /app/.env",
+      "postdeploy": ""
+    }
+  }
+}
