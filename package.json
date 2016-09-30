@@ -19,7 +19,8 @@
     "coverage": "npm run coverage-report && open ./coverage/lcov-report/index.html",
     "coverage-badge": "./node_modules/.bin/istanbul-cobertura-badger -e 95 -g 85 -b \"${PWD##*/}\"",
     "validate": "./node_modules/.bin/module-validator",
-    "depcheck": "./node_modules/.bin/dependency-checker"
+    "depcheck": "./node_modules/.bin/dependency-checker",
+    "start": "node app.js"
   },
   "dependencies": {
     "bcrypt": "^0.8.7",
