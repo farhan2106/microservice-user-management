@@ -1,15 +1,20 @@
+'use strict';
+
 const server = require('./../../server.js').server;
 const fixtures = require('./../fixtures');
 const Models = fixtures.Models;
 
 /**
- * GET: /activate
+ * PUT: /activate
  */
-describe('GET /activate', function () {
+describe('PUT /activate', function () {
+
+  let userId = null;
 
   beforeEach(function (done) {
     fixtures.createUser()
-    .then(function () {
+    .then(function (user) {
+      userId = user.id;
       done();
     })
   });
@@ -22,15 +27,20 @@ describe('GET /activate', function () {
   });
 
   it("User not found.", (done) => {
-    let options = {
-      method: "GET",
-      url: "/activate/aaa/fakeUrl",
-    };
+    Models.User.update({
+      _id: userId
+    }, { active: 0 })
+    .then(function (user) {
+      let options = {
+        method: "PUT",
+        url: "/activate/aaa",
+      };
 
-    server.inject(options, function(response) {
-      expect(response.statusCode).toBe(404);
-      expect(response.result.message).toContain('User not found');
-      done();
+      server.inject(options, function(response) {
+        expect(response.statusCode).toBe(404);
+        expect(response.result.message).toContain('User not found');
+        done();
+      });
     });
   });
 
@@ -55,13 +65,12 @@ describe('GET /activate', function () {
         });
     }).then(function (user) {
       let options = {
-        method: "GET",
-        url: "/activate/aaa/" + encodeURIComponent('http://google.com.my'),
+        method: "PUT",
+        url: "/activate/aaa",
       };
 
       server.inject(options, function(response) {
-        // 302 - redirectiong found
-        expect(response.statusCode).toBe(302);
+        expect(response.statusCode).toBe(200);
         done();
       });
     }).catch(function (err) {
@@ -97,8 +106,7 @@ describe('POST /activate', function () {
       method: "POST",
       url: "/activate",
       payload: {
-        usernameOrEmail: 'farhan2106@gmail.com',
-        redirectUrl: 'fakeUrl'
+        usernameOrEmail: 'farhan2106@gmail.com'
       }
     };
 
@@ -132,8 +140,7 @@ describe('POST /activate', function () {
         method: "POST",
         url: "/activate",
         payload: {
-          usernameOrEmail: fixtures.testUser.email,
-          redirectUrl: 'fakeUrl'
+          usernameOrEmail: fixtures.testUser.email
         }
       };
 

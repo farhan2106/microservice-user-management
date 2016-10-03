@@ -8,5 +8,6 @@ module.exports = {
   'E7': 'E7|Invalid username string.',
   'E8': 'E8|Token has expired.',
   'E9': 'E9|Username or email already exist.',
-  'E10': 'E10|Failed to send activation email.'
+  'E10': 'E10|Failed to send activation email.',
+  'E11': 'E11|Your chosen password does not match.'
 }

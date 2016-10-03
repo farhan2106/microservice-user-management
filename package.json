@@ -31,9 +31,8 @@
     "hapi": "^15.1.0",
     "hapi-auth-jwt2": "^7.1.3",
     "jsonwebtoken": "^7.1.9",
+    "mockgoose": "^6.0.8",
     "mongoose": "^4.6.1",
-    "nodemailer": "^2.6.4",
-    "nodemailer-mock": "^1.1.4",
     "q": "^1.4.1",
     "valid-objectid": "0.0.1"
   },

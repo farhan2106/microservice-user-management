@@ -1,3 +1,5 @@
+'use strict';
+
 const server = require('./../../server.js').server;
 const fixtures = require('./../fixtures');
 const Models = fixtures.Models;
@@ -23,8 +25,7 @@ describe('/resetPassword (Attempt)', function () {
       method: "POST",
       url: "/resetPassword",
       payload: {
-        usernameOrEmail: 'testUsera',
-        redirectUrl: 'http://localhost:3000/login'
+        usernameOrEmail: 'testUsera'
       }
     };
 
@@ -43,8 +44,7 @@ describe('/resetPassword (Attempt)', function () {
       method: "POST",
       url: "/resetPassword",
       payload: {
-        usernameOrEmail: fixtures.testUser.username,
-        redirectUrl: 'http://localhost:3000/login'
+        usernameOrEmail: fixtures.testUser.username
       }
     };
 
@@ -85,7 +85,8 @@ describe('/resetPassword (Actual)', function () {
       url: "/resetPassword",
       payload: {
         secret: 'aaaa',
-        password: 'aaaaAAAA'
+        password: 'aaaaAAAA',
+        password2: 'aaaaAAAA'
       }
     };
 
@@ -126,7 +127,8 @@ describe('/resetPassword (Actual)', function () {
         url: "/resetPassword",
         payload: {
           secret: secret,
-          password: fixtures.testUser.password
+          password: fixtures.testUser.password,
+          password2: fixtures.testUser.password
         }
       };
 

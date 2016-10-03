@@ -1,3 +1,5 @@
+'use strict';
+
 const server = require('./../../server.js').server;
 const fixtures = require('./../fixtures');
 
@@ -35,7 +37,7 @@ describe('/verifyToken', function () {
         method: "POST",
         url: "/logout",
         headers: {
-          authorization: response.result
+          authorization: token
         }
       };
 

@@ -1,3 +1,4 @@
+require('dotenv').config();
 var Jasmine = require('jasmine');
 var SpecReporter = require('jasmine-spec-reporter');
 var noop = function() {};

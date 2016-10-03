@@ -1,6 +1,5 @@
 'use strict';
 
-require('dotenv').config();
 const Good = require('good');
 const Hapi = require('hapi');
 const Models = require('./app/db').Models;
