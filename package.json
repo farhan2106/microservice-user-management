@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.14",
-    "eslint": "^3.7.1",
+    "eslint": "^3.8.0",
     "eslint-config-google": "^0.6.0",
     "jasmine-spec-reporter": "^2.7.0",
     "mockgoose": "^6.0.8"
