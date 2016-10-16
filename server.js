@@ -9,15 +9,9 @@ const Boom = require('boom');
 const server = new Hapi.Server({
   debug: {request: ['error']}
 });
-// @todo: whitelist certain ip, not just *
 server.connection({
-  host: 'localhost',
-  port: 3000,
-  routes: {
-    cors: {
-      origin: ['*']
-    }
-  }
+  host: '0.0.0.0',
+  port: 3000
 });
 
 server.register([
@@ -71,6 +65,16 @@ server.auth.strategy('jwt', 'jwt', {
 });
 
 server.auth.default('jwt');
+server.route({
+  config: {
+    auth: false
+  },
+  method: 'GET',
+  path: '/cors/test',
+  handler: function(request, reply) {
+    reply('Hello!');
+  }
+});
 server.route(require('./app/routes/index.js'));
 server.route(require('./app/routes/users.js'));
 

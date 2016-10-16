@@ -18,7 +18,6 @@ module.exports = [{
   method: 'POST',
   path: `/${root}`,
   config: {
-    cors: true,
     handler: (req, reply) => {
       let username = req.payload.username,
         email = req.payload.email,
@@ -47,7 +46,6 @@ module.exports = [{
   method: 'GET',
   path: `/${root}/{finder}`,
   config: {
-    cors: true,
     handler: (req, reply) => {
       let idUsernameEmail = decodeURIComponent(req.params.finder),
         finder = [{username: idUsernameEmail}, {email: idUsernameEmail}],
@@ -84,7 +82,6 @@ module.exports = [{
   method: 'PUT',
   path: `/${root}/{id}`,
   config: {
-    cors: true,
     handler: (req, reply) => {
       let id = encodeURIComponent(req.params.id),
         username = req.payload.username,
@@ -148,7 +145,6 @@ module.exports = [{
   method: 'DELETE',
   path: `/${root}/{id}`,
   config: {
-    cors: true,
     handler: (req, reply) => {
       let id = req.params.id,
         User = req.Models.User;

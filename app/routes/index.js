@@ -23,7 +23,6 @@ module.exports = [{
   path: '/login',
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let usernameOrEmail = req.payload.usernameOrEmail,
         password = req.payload.password,
@@ -75,7 +74,6 @@ module.exports = [{
   method: 'POST',
   path: '/logout',
   config: {
-    cors: true,
     handler: (req, reply) => {
       let token = req.headers.authorization,
         Blacklist = req.Models.Blacklist;
@@ -103,7 +101,6 @@ module.exports = [{
   path: `/register`,
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let username = req.payload.username,
         email = req.payload.email,
@@ -132,7 +129,6 @@ module.exports = [{
   path: `/socialRegister`,
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let socialId = req.payload.socialId,
         socialSource = req.payload.socialSource,
@@ -162,7 +158,6 @@ module.exports = [{
   path: `/activate`,
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let usernameOrEmail = req.payload.usernameOrEmail,
         User = req.Models.User;
@@ -199,7 +194,6 @@ module.exports = [{
   path: `/activate/{secret}`,
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let secret = req.params.secret,
         User = req.Models.User;
@@ -236,7 +230,6 @@ module.exports = [{
   path: '/verifyToken',
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let token = req.headers.authorization,
         User = req.Models.User,
@@ -273,7 +266,6 @@ module.exports = [{
   path: '/resetPassword',
   config: {
     auth: false,
-    cors: true,
     handler: (req, reply) => {
       let usernameOrEmail = req.payload.usernameOrEmail,
         secret = req.payload.secret,
