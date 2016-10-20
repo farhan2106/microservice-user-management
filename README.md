@@ -8,7 +8,7 @@
 ## Features
 Available defined tasks:
 - `npm run dev` - Starts development server.
-- `npm run lint` - Runs `eslint`.
+- `npm run lint` - Runs [`standard`](https://github.com/feross/standard).
 - `npm test` - Runs api testing.
 
 Rename .env.sample to .env with your configurations.

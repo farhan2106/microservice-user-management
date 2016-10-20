@@ -1,47 +1,47 @@
-'use strict';
+/* global describe, it, beforeEach, afterEach, expect */
 
-const server = require('./../../server.js').server;
-const fixtures = require('./../fixtures');
-const Models = fixtures.Models;
+'use strict'
+
+const server = require('./../../server.js').server
+const fixtures = require('./../fixtures')
 
 /**
  * PUT: /users/{data} - update, where data is id
  */
-let userId = null;
+let userId = null
 
 describe('PUT /users', function () {
-
   beforeEach(function (done) {
     fixtures.createUser()
     .then(function (user) {
-      userId = user.id;
-      done();
+      userId = user.id
+      done()
     })
-  });
+  })
 
   afterEach(function (done) {
     fixtures.delUser()
     .then(function () {
-      done();
+      done()
     })
-  });
+  })
 
-  it("Invalid username string.", (done) => {
+  it('Invalid username string.', (done) => {
     let options = {
-      method: "POST",
-      url: "/login",
+      method: 'POST',
+      url: '/login',
       payload: {
         usernameOrEmail: fixtures.testUser.email,
         password: fixtures.testUser.password,
         issuer: 'appname.com',
         expiresIn: '24h'
       }
-    };
+    }
 
-    server.inject(options, function(response) {
+    server.inject(options, function (response) {
       options = {
-        method: "PUT",
-        url: "/users/" + userId,
+        method: 'PUT',
+        url: '/users/' + userId,
         payload: {
           username: '__aaaaa',
           email: fixtures.testUser.email,
@@ -51,32 +51,32 @@ describe('PUT /users', function () {
         headers: {
           authorization: response.result
         }
-      };
+      }
 
-      server.inject(options, function(response) {
-        expect(response.statusCode).toBe(422);
-        expect(response.result.message).toContain('Invalid username string.');
-        done();
-      });
-    });
-  });
+      server.inject(options, function (response) {
+        expect(response.statusCode).toBe(422)
+        expect(response.result.message).toContain('Invalid username string.')
+        done()
+      })
+    })
+  })
 
-  it("Invalid password string.", (done) => {
+  it('Invalid password string.', (done) => {
     let options = {
-      method: "POST",
-      url: "/login",
+      method: 'POST',
+      url: '/login',
       payload: {
         usernameOrEmail: fixtures.testUser.email,
         password: fixtures.testUser.password,
         issuer: 'appname.com',
         expiresIn: '24h'
       }
-    };
+    }
 
-    server.inject(options, function(response) {
+    server.inject(options, function (response) {
       options = {
-        method: "PUT",
-        url: "/users/" + userId,
+        method: 'PUT',
+        url: '/users/' + userId,
         payload: {
           username: fixtures.testUser.username,
           email: fixtures.testUser.email,
@@ -86,32 +86,32 @@ describe('PUT /users', function () {
         headers: {
           authorization: response.result
         }
-      };
+      }
 
-      server.inject(options, function(response) {
-        expect(response.statusCode).toBe(422);
-        expect(response.result.message).toContain('Invalid password string.');
-        done();
-      });
-    });
-  });
+      server.inject(options, function (response) {
+        expect(response.statusCode).toBe(422)
+        expect(response.result.message).toContain('Invalid password string.')
+        done()
+      })
+    })
+  })
 
-  it("Invalid email string.", (done) => {
+  it('Invalid email string.', (done) => {
     let options = {
-      method: "POST",
-      url: "/login",
+      method: 'POST',
+      url: '/login',
       payload: {
         usernameOrEmail: fixtures.testUser.email,
         password: fixtures.testUser.password,
         issuer: 'appname.com',
         expiresIn: '24h'
       }
-    };
+    }
 
-    server.inject(options, function(response) {
+    server.inject(options, function (response) {
       options = {
-        method: "PUT",
-        url: "/users/" + userId,
+        method: 'PUT',
+        url: '/users/' + userId,
         payload: {
           username: fixtures.testUser.username,
           email: 'aasdasdasd@asdasd',
@@ -121,32 +121,32 @@ describe('PUT /users', function () {
         headers: {
           authorization: response.result
         }
-      };
+      }
 
-      server.inject(options, function(response) {
-        expect(response.statusCode).toBe(422);
-        expect(response.result.message).toContain('Invalid email string.');
-        done();
-      });
-    });
-  });
+      server.inject(options, function (response) {
+        expect(response.statusCode).toBe(422)
+        expect(response.result.message).toContain('Invalid email string.')
+        done()
+      })
+    })
+  })
 
-  it("Valid", (done) => {
+  it('Valid', (done) => {
     let options = {
-      method: "POST",
-      url: "/login",
+      method: 'POST',
+      url: '/login',
       payload: {
         usernameOrEmail: fixtures.testUser.email,
         password: fixtures.testUser.password,
         issuer: 'appname.com',
         expiresIn: '24h'
       }
-    };
+    }
 
-    server.inject(options, function(response) {
+    server.inject(options, function (response) {
       options = {
-        method: "PUT",
-        url: "/users/" + userId,
+        method: 'PUT',
+        url: '/users/' + userId,
         payload: {
           username: 'a' + fixtures.testUser.username,
           email: 'a' + fixtures.testUser.email,
@@ -156,13 +156,12 @@ describe('PUT /users', function () {
         headers: {
           authorization: response.result
         }
-      };
+      }
 
-      server.inject(options, function(response) {
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-    });
-  });
-
-});
+      server.inject(options, function (response) {
+        expect(response.statusCode).toBe(200)
+        done()
+      })
+    })
+  })
+})

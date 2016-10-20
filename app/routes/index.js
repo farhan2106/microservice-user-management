@@ -1,12 +1,12 @@
-'use strict';
+'use strict'
 
-const Joi = require('joi');
-const Boom = require('boom');
-const Bcrypt = require('bcrypt');
-const Jwt = require('jsonwebtoken');
-const errorCodes = require("./../../app/error_codes");
-const encrypt = require("./../../app/utils").encrypt;
-const UserModel = require("./../models/user");
+const Joi = require('joi')
+const Boom = require('boom')
+const Bcrypt = require('bcrypt')
+const Jwt = require('jsonwebtoken')
+const errorCodes = require('./../../app/error_codes')
+const encrypt = require('./../../app/utils').encrypt
+const UserModel = require('./../models/user')
 
 /**
  * POST: /login
@@ -24,11 +24,11 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let usernameOrEmail = req.payload.usernameOrEmail,
-        password = req.payload.password,
-        issuer = req.payload.issuer,
-        expiresIn = req.payload.expiresIn,
-        User = req.Models.User;
+      let usernameOrEmail = req.payload.usernameOrEmail
+      let password = req.payload.password
+      let issuer = req.payload.issuer
+      let expiresIn = req.payload.expiresIn
+      let User = req.Models.User
 
       User.find({
         $and: [
@@ -38,28 +38,28 @@ module.exports = [{
       })
       .then(users => {
         if (users.length === 0) {
-          throw Boom.unauthorized(errorCodes.E1);
+          throw Boom.unauthorized(errorCodes.E1)
         }
-        return users;
+        return users
       })
       .then(users => {
-        let user = users.pop();
+        let user = users.pop()
         if (Bcrypt.compareSync(password, user.password)) {
-          delete user._doc.password;
-          delete user._doc.__v;
+          delete user._doc.password
+          delete user._doc.__v
           let token = Jwt.sign(user._doc, process.env.SECRET, {
             expiresIn: expiresIn,
             issuer: issuer
             // audience
             // subject
-          });
-          reply(token);
+          })
+          reply(token)
         } else {
-          throw Boom.unauthorized(errorCodes.E2);
+          throw Boom.unauthorized(errorCodes.E2)
         }
       }).catch(err => {
-        reply(err);
-      });
+        reply(err)
+      })
     },
     validate: {
       payload: Joi.object({
@@ -75,11 +75,11 @@ module.exports = [{
   path: '/logout',
   config: {
     handler: (req, reply) => {
-      let token = req.headers.authorization,
-        Blacklist = req.Models.Blacklist;
+      let token = req.headers.authorization
+      let Blacklist = req.Models.Blacklist
 
       try {
-        let decoded = Jwt.verify(token, process.env.SECRET);
+        let decoded = Jwt.verify(token, process.env.SECRET)
         Blacklist.create({
           token: token,
           iss: decoded.iss,
@@ -87,12 +87,12 @@ module.exports = [{
           exp: decoded.exp
         })
         .then(blacklist => {
-          reply('Logged out.');
-        }).catch(function(err) {
-          throw Boom.serverUnavailable(err);
-        });
+          reply('Logged out.')
+        }).catch(function (err) {
+          throw Boom.serverUnavailable(err)
+        })
       } catch (jwtErr) {
-        reply(Boom.unauthorized(jwtErr));
+        reply(Boom.unauthorized(jwtErr))
       }
     }
   }
@@ -102,19 +102,19 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let username = req.payload.username,
-        email = req.payload.email,
-        password = req.payload.password;
+      let username = req.payload.username
+      let email = req.payload.email
+      let password = req.payload.password
 
       UserModel.create(username, email, password)
       .then(user => {
         // delete user.secret; // secret is require for activation
-        delete user.password;
-        reply(user);
+        delete user.password
+        reply(user)
       })
       .catch(err => {
-        reply(err);
-      });
+        reply(err)
+      })
     },
     validate: {
       payload: Joi.object({
@@ -130,20 +130,20 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let socialId = req.payload.socialId,
-        socialSource = req.payload.socialSource,
-        email = req.payload.email;
+      let socialId = req.payload.socialId
+      let socialSource = req.payload.socialSource
+      let email = req.payload.email
 
       UserModel.socialCreate(socialId, socialSource, email)
       .then(user => {
         // user = user.toObject();
-        delete user.password;
-        delete user.secret;
-        reply(user);
+        delete user.password
+        delete user.secret
+        reply(user)
       })
       .catch(err => {
-        reply(err);
-      });
+        reply(err)
+      })
     },
     validate: {
       payload: Joi.object({
@@ -159,8 +159,8 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let usernameOrEmail = req.payload.usernameOrEmail,
-        User = req.Models.User;
+      let usernameOrEmail = req.payload.usernameOrEmail
+      let User = req.Models.User
 
       User.find({
         active: 0,
@@ -168,20 +168,20 @@ module.exports = [{
       })
       .then(users => {
         if (users.length > 0) {
-          let user = users.shift();
-          return user;
+          let user = users.shift()
+          return user
         }
-        throw Boom.notFound(errorCodes.E1);
+        throw Boom.notFound(errorCodes.E1)
       })
       .then(user => {
         if (typeof user.toObject === 'function') {
-          user = user.toObject();
+          user = user.toObject()
         }
-        delete user.password;
-        reply(user);
+        delete user.password
+        reply(user)
       }).catch(err => {
-        reply(err);
-      });
+        reply(err)
+      })
     },
     validate: {
       payload: Joi.object({
@@ -195,8 +195,8 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let secret = req.params.secret,
-        User = req.Models.User;
+      let secret = req.params.secret
+      let User = req.Models.User
 
       User.find({
         secret: secret,
@@ -204,20 +204,20 @@ module.exports = [{
       })
       .then(users => {
         if (users.length > 0) {
-          let user = users.shift();
+          let user = users.shift()
           return User.update({
             _id: user._id
           }, {
             active: 1,
             secret: null
           }).then(status => {
-            reply(status);
-          });
+            reply(status)
+          })
         }
-        throw Boom.notFound(errorCodes.E1);
+        throw Boom.notFound(errorCodes.E1)
       }).catch(err => {
-        reply(err);
-      });
+        reply(err)
+      })
     },
     validate: {
       params: Joi.object({
@@ -231,33 +231,33 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let token = req.headers.authorization,
-        User = req.Models.User,
-        Blacklist = req.Models.Blacklist;
+      let token = req.headers.authorization
+      let User = req.Models.User
+      let Blacklist = req.Models.Blacklist
 
       try {
-        let decoded = Jwt.verify(token, process.env.SECRET);
+        let decoded = Jwt.verify(token, process.env.SECRET)
 
         Blacklist.find({
           token: req.headers.authorization
         }).then(blacklist => {
           if (blacklist.length > 0) {
-            throw Boom.unauthorized(errorCodes.E8);
+            throw Boom.unauthorized(errorCodes.E8)
           }
           return User.find({
             id: decoded.id
-          });
+          })
         }).then(users => {
           if (users) {
-            reply(decoded);
+            reply(decoded)
           } else {
-            throw Boom.unauthorized(errorCodes.E1);
+            throw Boom.unauthorized(errorCodes.E1)
           }
         }).catch(err => {
-          reply(err);
-        });
+          reply(err)
+        })
       } catch (jwtErr) {
-        reply(jwtErr);
+        reply(jwtErr)
       }
     }
   }
@@ -267,11 +267,11 @@ module.exports = [{
   config: {
     auth: false,
     handler: (req, reply) => {
-      let usernameOrEmail = req.payload.usernameOrEmail,
-        secret = req.payload.secret,
-        password = req.payload.password,
-        password2 = req.payload.password2,
-        User = req.Models.User;
+      let usernameOrEmail = req.payload.usernameOrEmail
+      let secret = req.payload.secret
+      let password = req.payload.password
+      let password2 = req.payload.password2
+      let User = req.Models.User
 
       /**
        * When secret && password, it will really reset password
@@ -279,62 +279,62 @@ module.exports = [{
        */
       if (secret && password && password2) {
         if (password !== password2) {
-          throw Boom.notFound(errorCodes.E11);
+          throw Boom.notFound(errorCodes.E11)
         }
 
         User.find({
           // active: 0,
           secret: secret
         })
-        .then(function(users) {
+        .then(function (users) {
           if (users.length === 0) {
-            throw Boom.notFound(errorCodes.E1);
+            throw Boom.notFound(errorCodes.E1)
           }
-          return users.shift();
-        }).then(function(user) {
+          return users.shift()
+        }).then(function (user) {
           return User.update({
             _id: user.id
           }, {
             // active: 1,
             password: encrypt(password),
             secret: null
-          }).then(function(status) {
-            reply(status);
-          });
+          }).then(function (status) {
+            reply(status)
+          })
         }).catch(err => {
-          reply(err);
-        });
+          reply(err)
+        })
       } else if (usernameOrEmail) {
-        let secret = UserModel.genSecret();
+        let secret = UserModel.genSecret()
         User.find({
           $and: [
             // {active: 1},
             {$or: [{username: usernameOrEmail}, {email: usernameOrEmail}]}
           ]
         })
-        .then(function(users) {
+        .then(function (users) {
           if (users.length === 0) {
-            throw Boom.notFound(errorCodes.E1);
+            throw Boom.notFound(errorCodes.E1)
           }
-          return users;
-        }).then(function(users) {
-          let user = users.shift();
+          return users
+        }).then(function (users) {
+          let user = users.shift()
           return User.update({
             _id: user.id
           }, {
             // active: 0,
             secret: secret
-          }).then(function(status) {
-            user.secret = secret;
-            reply(user);
+          }).then(function (status) {
+            user.secret = secret
+            reply(user)
           }).catch(err => {
-            reply(err);
-          });
+            reply(err)
+          })
         }).catch(err => {
-          reply(err);
-        });
+          reply(err)
+        })
       } else {
-        reply(Boom.badImplementation(errorCodes.E3));
+        reply(Boom.badImplementation(errorCodes.E3))
       }
     },
     validate: {
@@ -346,4 +346,4 @@ module.exports = [{
       })
     }
   }
-}];
+}]

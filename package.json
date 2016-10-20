@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "ncu && npm run lint && nodemon app.js",
     "test": "istanbul cover -x spec/*.js -x spec/**/*.js spec/run.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "lint": "./node_modules/.bin/eslint --quiet *.js */**/*.js",
+    "lint": "standard --fix",
     "dokku": {
       "predeploy": "",
       "postdeploy": ""
@@ -30,16 +30,17 @@
     "good-squeeze": "^5.0.0",
     "hapi": "^15.1.1",
     "hapi-auth-jwt2": "^7.1.3",
+    "inert": "^4.0.2",
+    "joi": "^9.2.0",
     "jsonwebtoken": "^7.1.9",
     "mockgoose": "^6.0.8",
     "mongoose": "^4.6.3",
     "q": "^1.4.1",
-    "valid-objectid": "0.0.1"
+    "valid-objectid": "0.0.1",
+    "vision": "^4.1.0"
   },
   "devDependencies": {
     "coveralls": "^2.11.14",
-    "eslint": "^3.8.0",
-    "eslint-config-google": "^0.6.0",
     "jasmine-spec-reporter": "^2.7.0",
     "mockgoose": "^6.0.8"
   },

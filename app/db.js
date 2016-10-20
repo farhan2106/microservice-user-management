@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-const UserModel = require('./models/user');
-const Mongoose = require('mongoose');
-Mongoose.Promise = global.Promise;
+const UserModel = require('./models/user')
+const Mongoose = require('mongoose')
+Mongoose.Promise = global.Promise
 
 if (process.argv[1].indexOf('spec/run.js') === -1) {
-  Mongoose.connect(process.env.DB);
+  Mongoose.connect(process.env.DB)
 }
 
 // init schema
@@ -15,24 +15,24 @@ const userSchema = Mongoose.Schema({
     required: true,
     index: { unique: true },
     validate: {
-      validator: function(v) {
-        let r = new RegExp(process.env.REGEX_USERNAME);
-        return r.test(v);
+      validator: function (v) {
+        let r = new RegExp(process.env.REGEX_USERNAME)
+        return r.test(v)
       },
       message: '{VALUE} is not a valid username.'
-    },
+    }
   },
   email: {
     type: String,
     required: true,
     index: { unique: true },
     validate: {
-      validator: function(v) {
-        let r = new RegExp(UserModel.emailRegex);
-        return r.test(v);
+      validator: function (v) {
+        let r = new RegExp(UserModel.emailRegex)
+        return r.test(v)
       },
       message: '{VALUE} is not a valid email.'
-    },
+    }
   },
   password: {
     type: String,
@@ -45,7 +45,7 @@ const userSchema = Mongoose.Schema({
         return r.test(v);
       },
       message: '{VALUE} is not a valid password.'
-    },*/
+    }, */
   },
   active: {
     type: Number,
@@ -71,41 +71,41 @@ const userSchema = Mongoose.Schema({
     type: Number,
     default: Date.now()
   }
-});
+})
 const blacklistSchema = Mongoose.Schema({
   token: {
     type: String,
-    required: true,
+    required: true
   },
   iss: {
     type: String,
-    required: true,
+    required: true
   },
   iat: {
     type: Number,
-    required: true,
+    required: true
   },
   exp: {
     type: Number,
-    required: true,
+    required: true
   }
-});
+})
 
 // init models
-let User = Mongoose.model('User', userSchema),
-  Blacklist = Mongoose.model('Blacklist', blacklistSchema);
+let User = Mongoose.model('User', userSchema)
+let Blacklist = Mongoose.model('Blacklist', blacklistSchema)
 
 // background service for db
-let removeOldTokens = function() {
-  let now = parseInt(Date.now().toString().substring(0, 10), 10);
+let removeOldTokens = function () {
+  let now = parseInt(Date.now().toString().substring(0, 10), 10)
   Blacklist.remove({ exp: { $lte: now } }, function (err) {
     if (err) {
-      throw err;
+      throw err
     }
-  });
-};
-setInterval(removeOldTokens, 86400); // 24h
-removeOldTokens();
+  })
+}
+setInterval(removeOldTokens, 86400) // 24h
+removeOldTokens()
 
 module.exports = {
   Models: {
@@ -113,4 +113,4 @@ module.exports = {
     Blacklist: Blacklist
   },
   Mongoose: Mongoose
-};
+}

@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-require('dotenv').config();
-const server = require('./server.js').server;
+require('dotenv').config()
+const server = require('./server.js').server
 
 server.start(err => {
   if (err) {
-    throw err;
+    throw err
   }
-  server.log('info', 'Server running at: ' + server.info.uri);
-});
+  server.log('info', 'Server running at: ' + server.info.uri)
+})
