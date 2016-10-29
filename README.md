@@ -2,78 +2,24 @@
 [![Build Status](https://travis-ci.org/farhan2106/microservice-user-management.svg?branch=master)](https://travis-ci.org/farhan2106/microservice-user-management)
 [![Coverage Status](https://coveralls.io/repos/github/farhan2106/microservice-user-management/badge.svg?branch=master)](https://coveralls.io/github/farhan2106/microservice-user-management?branch=master)
 
-## TODO:
-- Integrate [lout](https://github.com/hapijs/lout).
+## Development:
+Install the following packages:
+- `npm install -g standard`
+- `npm install -g npm-check-updates`
+- `npm install -g nodemon`
+
+Rename .env.sample to .env with your configurations.
+
+## Testing
+Testing is conducted using using `jasmine` with `istanbul` for code coverage.
+- `npm install -g istanbul`
+- `npm install -g jasmine`
 
 ## Features
 Available defined tasks:
 - `npm run dev` - Starts development server.
 - `npm run lint` - Runs [`standard`](https://github.com/feross/standard).
 - `npm test` - Runs api testing.
-
-Rename .env.sample to .env with your configurations.
-
-Below are the features of this micro service.
-
-## Routes
-- Index:
-  - POST: /login
-    - Payloads:
-      - usernameOrEmail
-      - password
-      - expiresIn
-      - issuer
-  - POST: /logout
-    - Headers:
-      - Authorization {token}
-  - POST: /register
-    - Payloads:
-      - username
-      - email
-      - password
-  - POST: /socialRegister
-    - Payloads:
-      - socialId - Social site user id
-      - socialSource - Social site eg. facebook, twitter etc
-  - GET: /activate/{secret}
-    - Params:
-      - secret
-  - POST: /verifyToken
-    - Headers:
-      - Authorization {token}
-  - POST: /resetPassword
-    - Payloads:
-      - usernameOrEmail - *If only this is provided then it will generate secret string that can be used to reset password.*
-      - secret
-      - password
-- User:
-  - POST: /users
-    - Headers:
-      - Authorization {token}      
-    - Payloads:
-      - username
-      - email
-      - password      
-  - GET: /users/{finder}
-    - Headers:
-      - Authorization {token}
-    - Params:
-      - finder - User Id, email or username
-  - PUT: /users/{id}
-    - Headers:
-      - Authorization {token}
-    - Params:
-      - id - User Id      
-    - Payloads:
-      - username
-      - email
-      - password
-      - active    
-  - DELETE: /users/{id}
-    - Headers:
-      - Authorization {token}      
-    - Params:
-      - id - User Id       
 
 ### Database
 It is using mongodb with mongoose.
@@ -97,10 +43,3 @@ It is using mongodb with mongoose.
 
 ### View Profile
 - User data can be retrieved by `id`, `username`, and `email`.
-
-## Testing
-Testing is conducted using using `jasmine` with `istanbul` for code coverage.
-- `npm install -g istanbul`
-- `npm install -g jasmine`
-
-Linting is also available via `eslint`. I follow `eslint-config-google` standard.
