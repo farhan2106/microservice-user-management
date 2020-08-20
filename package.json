@@ -23,7 +23,7 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "bcrypt": "^0.8.7",
+    "bcrypt": "^5.0.0",
     "boom": "^4.2.0",
     "dotenv": "^2.0.0",
     "good": "^7.0.2",
